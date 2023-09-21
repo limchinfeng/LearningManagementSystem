@@ -24,7 +24,9 @@ model Course {
   categoryId String? @db.ObjectId
   category Category? @relation(fields: [categoryId], references: [id])
 
+  chapters Chapter[]
   attachments Attachment[]
+  purchases Purchase[]
 
   @@index([categoryId])
 }
@@ -48,3 +50,67 @@ model Attachment {
   @@index([courseId])
 }
 
+model Chapter {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String @db.String
+  description String? @db.String
+  videoUrl String? @db.String
+  position Int
+  isPublished Boolean @default(false)
+  isFree Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  muxData MuxData?
+
+  courseId String @db.ObjectId
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  userProgress UserProgress[]
+
+  @@index([courseId])
+}
+
+model MuxData {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  assetId String @db.String
+  playbackId String? @db.String
+
+  chapterId String  @db.ObjectId @unique
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)  
+}
+
+model UserProgress {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.String
+  isCompleted Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chapterId String @db.ObjectId
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@index([chapterId])
+  @@unique([userId, chapterId])
+}
+
+model Purchase {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courseId String @db.ObjectId
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+}
+
+model StripeCustomer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique @db.String
+  stripeCustomerId String @unique @db.String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
