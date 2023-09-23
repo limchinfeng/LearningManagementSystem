@@ -81,7 +81,7 @@ export const ChapterForm = ({
         </div>
       )}
       <div className="font-medium flex items-center justify-between">
-        Course description
+        Course chapter
         <Button onClick={toggleCreating} variant="ghost"> 
           {isCreating ? (
             <>Cancel</>
